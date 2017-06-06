@@ -1,0 +1,138 @@
+---
+title: "ChIP-seq Analysis"
+author: "Lars Knopf"
+date: "November 21, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Indexing the target genome
+use -C for colorspace index
+```{bash, indexgenome, eval=FALSE}
+bowtie-build mm9.fa mm9
+```
+
+### Unpacking .sra files
+
+```{bash, unpack, eval=FALSE}
+fastq-dump BMAL1_ZT06.sra
+```
+
+### Alignment via Bowtie
+
+```{bash, align, eval=FALSE}
+bowtie -m 1 -S -n 3 mm9_bowtie1 BMAL1_ZT06.fastq | samtools view -b -S > BMAL1_ZT06.bam
+```
+
+### Sorting the .bam file
+add -trackline to use for peaksplitter
+```{bash, sort, eval=FALSE}
+samtools sort BMAL1_ZT06.bam -o BMAL1_ZT06_sorted.bam
+```
+
+### Indexing the .bam file
+
+```{bash, index, eval=FALSE}
+samtools index BMAL1_ZT06_sorted.bam
+```
+
+### Creating .bedgraph file
+
+```{bash, bedgraph, eval=FALSE}
+genomeCoverageBed -ibam BMAL1_ZT06_sorted.bam -d > BMAL1_ZT06.bedgraph
+```
+
+![Amount of Tags at each Position in the dbp locus at ZT 6](/home/knopf/Bmal/figures/igv_dbp_06.png)
+
+
+### Peakfinding
+
+
+macs14 -t ZT02_rmdup_sorted.bam -c Input_DNA_sorted.bam --format=BAM --name=ZT02 gsize=2400000000 --tsize=37 --bw=150
+macs14 -t ZT06_rmdup_sorted.bam -c Input_DNA_sorted.bam --format=BAM --name=ZT06 gsize=2400000000 --tsize=37 --bw=150
+macs14 -t ZT10_rmdup_sorted.bam -c Input_DNA_sorted.bam --format=BAM --name=ZT10 gsize=2400000000 --tsize=37 --bw=150
+macs14 -t ZT14_rmdup_sorted.bam -c Input_DNA_sorted.bam --format=BAM --name=ZT14 gsize=2400000000 --tsize=37 --bw=150
+macs14 -t ZT18_rmdup_sorted.bam -c Input_DNA_sorted.bam --format=BAM --name=ZT18 gsize=2400000000 --tsize=37 --bw=150
+macs14 -t ZT22_rmdup_sorted.bam -c Input_DNA_sorted.bam --format=BAM --name=ZT22 gsize=2400000000 --tsize=37 --bw=150
+
+```{peakfinding, eval=FALSE}
+macs14 -t BMAL1_ZT06_sorted.bam -c Input_DNA_sorted.bam --format=BAM --name=BMAL1_ZT06 gsize=2400000000 --tsize=37 --bw=150
+```
+
+![Peaks found in the dbp locus at ZT 6](/home/knopf/Bmal/figures/igv_dbp_06_peaks.png)
+
+
+### Annotating the peaks
+
+
+### Annotating coverage file
+annotatePeaks.pl newPeakFile_500_bw50.bed mm9 > newPeakFile_500_bw50_annot.txt
+
+
+
+
+### merge all peaks in one file
+cat ZT22_peaks.bed ZT18_peaks.bed ZT14_peaks.bed ZT10_peaks.bed ZT06_peaks.bed ZT02_peaks.bed > all_peaks
+sortBed -i all_peaks > all_peaks_sorted
+mergeBed -i all_peaks_sorted > allmerged.bed
+annotatePeaks.pl allmerged.bed mm9 > allmerged_annot.bed
+
+### differentiate peaks with HOMER
+mergePeaks -d given 150 ZT02_rmdup_peaks.bed ZT06_rmdup_peaks.bed ZT10_rmdup_peaks.bed ZT14_rmdup_peaks.bed ZT18_rmdup_peaks.bed ZT22_rmdup_peaks.bed > newPeakFile_rmdup_150bp.txt
+
+mergePeaks -d 150 ZT02_r1_bw_peaks.bed ZT06_r1_bw_peaks.bed ZT10_r1_bw_peaks.bed ZT14_r1_bw_peaks.bed ZT18_r1_bw_peaks.bed ZT22_r1_bw_peaks.bed ZT02_r2_bw_peaks.bed ZT06_r2_bw_peaks.bed ZT10_r2_bw_peaks.bed ZT14_r2_bw_peaks.bed ZT18_r2_bw_peaks.bed ZT22_r2_bw_peaks.bed > newPeakFile_r1_bw_150bp.txt
+
+
+#newer version
+
+mergePeaks -d 150 ZT02_r1_bw_peaks.bed ZT06_r1_bw_peaks.bed ZT10_r1_bw_peaks.bed ZT14_r1_bw_peaks.bed ZT18_r1_bw_peaks.bed ZT22_r1_bw_peaks.bed ZT02_r2_bw_peaks.bed ZT06_r2_bw_peaks.bed ZT10_r2_bw_peaks.bed ZT14_r2_bw_peaks.bed ZT18_r2_bw_peaks.bed ZT22_r2_bw_peaks.bed > newPeakFile_rmdup_150bp_bw300_reps.txt
+
+mergePeaks -d 150 ZT02_C.bed ZT06_C.bed ZT10_C.bed ZT14_C.bed ZT18_C.bed ZT22_C.bed > allmerged_C.txt
+mergePeaks -d 500 ZT02_D.bed ZT06_D.bed ZT10_D.bed ZT14_D.bed ZT18_D.bed ZT22_D.bed > allmerged_D.txt
+mergePeaks -d 500 ZT02_E.bed ZT06_E.bed ZT10_E.bed ZT14_E.bed ZT18_E.bed ZT22_E.bed > allmerged_E.txt
+
+
+#then, use positions( chr and bases) to create coverage file
+
+
+### coverage
+
+bamToBed -i BMAL1_ZT06_sorted.bam -tag > BMAL1_ZT06_tobed.bed
+sortBed -i BMAL1_ZT06_tobed.bed > BMAL1_ZT06_tobed_sorted.bed
+coverageBed -counts -b allmerged.bed -a BMAL1_ZT06_tobed_sorted.bed > ZT06coverage.bed
+sortBed -i ZT06coverage.bed > ZT06coverage_sorted.bed
+
+
+
+### Count all reads
+
+```{bash, bedgraph, eval=FALSE}
+samtools view -c ZT06_sorted.bam
+```
+
+### Count number of mapped reads
+
+```{bash, bedgraph, eval=FALSE}
+samtools view -c -F 4 ZT06_sorted.bam
+```
+
+### check width of merged peaks
+allmerged = read.table("allmerged.bed")
+
+allmerged[,4] = allmerged[,3] - allmerged[,2]
+
+allmerged_table = table(allmerged[,4])
+
+sum(allmerged_table[names(allmerged_table)>250])/length(allmerged[,1]) #fraction of peaks wider than 250 bases
+
+
+### convert bedgraph to bigwig
+bedGraphToBigWig ZT02_rmdup.bedgraph mm9.chrom.sizes ZT02_rmdup.wig
+### convert bigwig to wig
+bigWigToWig in out
+
+java -jar PeakSplitter.jar <-p peakfile> <-w wig file/folder> <-o output folder> [options]
+
