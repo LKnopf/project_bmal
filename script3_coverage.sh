@@ -30,7 +30,7 @@ annotatePeaks.pl allmerged_C.bed mm9 -size 500 -d ZT14_r2/ > ZT14_r2_covhomer_C.
 annotatePeaks.pl allmerged_C.bed mm9 -size 500 -d ZT18_r2/ > ZT18_r2_covhomer_C.txt
 annotatePeaks.pl allmerged_C.bed mm9 -size 500 -d ZT22_r2/ > ZT22_r2_covhomer_C.txt
 
-
+"
 annotatePeaks.pl allmerged_D.bed mm9 -size 500 -d ZT02_r1/ > ZT02_r1_covhomer_D.txt
 annotatePeaks.pl allmerged_D.bed mm9 -size 500 -d ZT06_r1/ > ZT06_r1_covhomer_D.txt
 annotatePeaks.pl allmerged_D.bed mm9 -size 500 -d ZT10_r1/ > ZT10_r1_covhomer_D.txt
@@ -59,4 +59,5 @@ annotatePeaks.pl allmerged_E.bed mm9 -size 500 -d ZT10_r2/ > ZT10_r2_covhomer_E.
 annotatePeaks.pl allmerged_E.bed mm9 -size 500 -d ZT14_r2/ > ZT14_r2_covhomer_E.txt
 annotatePeaks.pl allmerged_E.bed mm9 -size 500 -d ZT18_r2/ > ZT18_r2_covhomer_E.txt
 annotatePeaks.pl allmerged_E.bed mm9 -size 500 -d ZT22_r2/ > ZT22_r2_covhomer_E.txt
+"
 
