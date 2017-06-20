@@ -1,4 +1,44 @@
-#rhythmicity analysis
+#meta2d for transcript
+library(MetaCycle)
+
+annot <- read.delim("rma_annot_new.txt")
+
+data <- read.delim("rma_data_new.txt")
+
+data[,1] = annot[,2]
+
+write.table(data, file = "rma_data_v2.txt", append = FALSE, quote = FALSE, sep = "\t",
+            eol = "\n", na = "NA", dec = ".", row.names = FALSE,
+            col.names = FALSE)
+
+data_v2 <- read.delim("rma_data_v2.txt")
+
+meta2d("rma_data_v2.txt", outdir = "metaout", filestyle = "txt", 
+       timepoints = c(18,	20,	22,	24,	26,	28,	30,	32,	34,	36,	38,	40,	42,	44,	46,	48,	50,	52,	54,	56,	58,	60,	62,	64) , 
+       minper = 22,
+       maxper = 26, 
+       cycMethod = c("ARS", "JTK", "LS"),
+       analysisStrategy = "auto", outputFile = TRUE, outIntegration = "both",
+       adjustPhase = "predictedPer", combinePvalue = "fisher",
+       weightedPerPha = FALSE, ARSmle = "auto", ARSdefaultPer = 24,
+       outRawData = FALSE, releaseNote = TRUE, outSymbol = "")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#only JTK
 source("JTK_CYCLEv3.1.R")
 
 project <- "Microarray"
