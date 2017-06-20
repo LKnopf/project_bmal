@@ -1,5 +1,5 @@
 library(corrplot)
-
+library(MetaCycle)
 
 meta2d_rna = na.omit(read.table("metaout/meta2d_rma_data_v2.txt", header=TRUE))
 genes_transcript_meta = meta2d_rna[, c("CycID", "JTK_BH.Q", "JTK_pvalue", "JTK_period", "JTK_adjphase", "JTK_amplitude")]
@@ -76,8 +76,10 @@ rhyth_numbr[5] = sum(a[names(a)<=0.2])/use_amount
 #count appearences of genes
 
 #create lists of genes with binding sites and output
-genes_transcript = na.omit(data.frame(read.table("transcript_genes.txt"))) #load table of transcribed genes with p-values
-genes_transcript = genes_transcript[-1,]
+genes_transcript = genes_transcript_meta
+
+#genes_transcript = na.omit(data.frame(read.table("transcript_genes.txt"))) #load table of transcribed genes with p-values
+#genes_transcript = genes_transcript[-1,]
 colnames(genes_transcript) = c("Gene", "BH.Q", "ADJ.P", "PER", "LAG",	"AMP")
 
 
