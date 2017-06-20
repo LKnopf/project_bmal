@@ -21,7 +21,7 @@ write.table(true_peaks[ -1 , 2:4 ], file = "allmerged_C_sub.txt", append = FALSE
             #eol = "\n", na = "NA", dec = ".", 
             row.names = FALSE,
             col.names = FALSE)
-
+ 
 
 
 
