@@ -12,7 +12,6 @@ for (rep in 1:2) {
 
     
     write.table(a[ -1 , 1:3 ], file = name_save, append = FALSE, quote = FALSE, sep = "\t",
-                #eol = "\n", na = "NA", dec = ".", 
                 row.names = FALSE,
                 col.names = FALSE)
     
