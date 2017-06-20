@@ -1,12 +1,10 @@
-
+library(gtools)
 
 strcount <- function(x, pattern, split){
-  
   unlist(lapply(
     strsplit(x, split),
     function(z) na.omit(length(grep(pattern, z)))
   ))
-  
 }
 
 name = "ALL_split_C.bed"
