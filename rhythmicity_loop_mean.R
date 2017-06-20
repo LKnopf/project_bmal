@@ -27,12 +27,12 @@ corr_mean_all = array(0, dim=c(14,14,40))
 corr_mean_rt = array(0, dim=c(14,14,40))
 corr_mean_nort = array(0, dim=c(14,14,40))
 
-for (amount in 1:1) {
+for (amount in 1:40) {
 
 print(amount)
   
   
-use_amount = 800*amount
+use_amount = 20*amount
 tc_use = data.frame(tc[1:use_amount,])
 rhyth_numbr = c(0,0,0,0,0,use_amount)
 
@@ -120,7 +120,8 @@ colnames(genes_check) = c("Gene","found_bind", "rhythmic_bind", "found_transcrip
 for (gene in 1:length(genes_check[,1])) {
   
   L = results_norm$Probeset == genes_check[gene,1]
-  K = results_norm[L,]
+  #K = results_norm[L,]
+  K = subset(results_norm, L)
   K = K[order(K[,2]),] 
   
   genes_check[gene,2] = length(K[,1])
@@ -135,7 +136,8 @@ for (gene in 1:length(genes_check[,1])) {
   }
   
   M = genes_transcript_meta$Gene == genes_check[gene,1]
-  N = genes_transcript_meta[M,]
+  N = subset(genes_transcript_meta, M)
+  #N = genes_transcript_meta[M,]
   N = N[order(N[,2]),] 
   
   genes_check[gene,4] = length(N[,1])
