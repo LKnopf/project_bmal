@@ -7,8 +7,14 @@ genes_transcript_meta = meta2d_rna[, c("CycID", "JTK_BH.Q", "JTK_pvalue", "JTK_p
 colnames(genes_transcript_meta) = c("Gene", "BH.Q", "ADJ.P", "PER", "LAG", "AMP")
 
 #START HERE WITH PRE-CREATED DATA
-tc = bs_C[,19:25]
-tc[,1] = bs_C[,12]
+
+bs_data = bs_paper_self #bs_C
+loop_count = 1
+loop_step = 2049
+
+tc = bs_data[,19:25]
+tc[,1] = bs_data[,12]
+
 tc = na.omit(data.frame(tc))
 
 
@@ -22,17 +28,18 @@ tc = data.frame(tc)"
 tc_sortmean = tc[ order(r.mean, decreasing = T), ]"
 
 
-result_mean = data.frame(matrix(0,40,6))
-corr_mean_all = array(0, dim=c(14,14,40))
-corr_mean_rt = array(0, dim=c(14,14,40))
-corr_mean_nort = array(0, dim=c(14,14,40))
+result_mean = data.frame(matrix(0,loop_count,6))
+corr_mean_all = array(0, dim=c(14,14,loop_count))
+corr_mean_rt = array(0, dim=c(14,14,loop_count))
+corr_mean_nort = array(0, dim=c(14,14,loop_count))
 
-for (amount in 1:40) {
+for (amount in 1:loop_count) {
 
 print(amount)
   
   
-use_amount = 20*amount
+use_amount = loop_step*amount
+
 tc_use = data.frame(tc[1:use_amount,])
 rhyth_numbr = c(0,0,0,0,0,use_amount)
 
@@ -61,8 +68,8 @@ meta2d("tc_use.txt", outdir = "metaout", filestyle = "txt",
        outRawData = FALSE, releaseNote = TRUE, outSymbol = "")
 
 meta2d_bs = (read.table("metaout/meta2d_tc_use.txt", header=TRUE))
-results_norm = meta2d_bs[, c("CycID", "JTK_BH.Q", "JTK_pvalue", "JTK_period", "JTK_adjphase", "JTK_amplitude")]
-#results_norm = meta2d_bs[, c("CycID", "ARS_BH.Q", "ARS_pvalue", "ARS_period", "ARS_adjphase", "ARS_amplitude")]
+#results_norm = meta2d_bs[, c("CycID", "JTK_BH.Q", "JTK_pvalue", "JTK_period", "JTK_adjphase", "JTK_amplitude")]
+results_norm = meta2d_bs[, c("CycID", "ARS_BH.Q", "ARS_pvalue", "ARS_period", "ARS_adjphase", "ARS_amplitude")]
 colnames(results_norm) = c("Probeset", "BH.Q", "ADJ.P", "PER", "LAG", "AMP")
 
 
@@ -93,15 +100,16 @@ colnames(genes_binding) = c("Gene")
 genes_transcript_names = unique(data.frame(genes_transcript_meta[,1]))   #dataframe with names only
 colnames(genes_transcript_names) = c("Gene")
 
+
 genes_check = na.omit(merge(genes_binding, genes_transcript_names))
-results_norm = na.omit(results_norm)
+#results_norm = na.omit(results_norm)
 
 genes_check[,2] = 0
 genes_check[,3] = 0
 genes_check[,4] = 0
 genes_check[,5] = 0
 genes_check[,6] = 0
-genes_check[,7] = 0
+genes_check[,7] = 100
 genes_check[,8] = 0
 genes_check[,9] = 0
 genes_check[,10] = 0
@@ -117,6 +125,8 @@ colnames(genes_check) = c("Gene","found_bind", "rhythmic_bind", "found_transcrip
                           "phase_bind", "phase_transcript", "q_bs", "q_rna", "amp_bs", "amp_rna",
                           "bs_mean", "rna_mean", "bs_amp2", "rna_amp2", "TSS_dist")
 
+genes_check_nu = genes_check
+pos = 0
 
 #loop to check genes for rhythmicity
 for (gene in 1:length(genes_check[,1])) {
@@ -125,6 +135,10 @@ for (gene in 1:length(genes_check[,1])) {
   #K = results_norm[L,]
   K = subset(results_norm, L)
   K = K[order(K[,2]),] 
+  print(K)
+  print(genes_check[gene,1])
+  
+  
   
   genes_check[gene,2] = length(K[,1])
   genes_check[gene,6] = K[1,5]
@@ -140,18 +154,22 @@ for (gene in 1:length(genes_check[,1])) {
   M = genes_transcript_meta$Gene == genes_check[gene,1]
   N = subset(genes_transcript_meta, M)
   #N = genes_transcript_meta[M,]
-  N = N[order(N[,2]),] 
-  
-  genes_check[gene,4] = length(N[,1])
-  genes_check[gene,7] = N[1,5]
-  genes_check[gene,9] = N[1,2]
-  genes_check[gene,11] = N[1,6]
+  N = N[order(N[,2], decreasing = TRUE),] 
+  print(N)
   
   
   for (step in 1:length(N[,1])) {
     if (N[step,2] <= 0.1) {
       genes_check[gene,5] = genes_check[gene,5] + 1
     }
+    genes_check[gene,4] = length(N[,1])
+    genes_check[gene,7] = N[step,5]
+    genes_check[gene,9] = N[step,2]
+    genes_check[gene,11] = N[step,6]
+    
+    pos = pos + 1
+    genes_check_nu[pos,] = genes_check[gene,]
+    
   }
   
 }
@@ -191,7 +209,7 @@ RNA_values <- read.delim("rma_data_new.txt")
 RNA_values[,1] <- read.delim("rma_annot_new.txt")[,2]
 RNA_values = na.omit(RNA_values)
 
-TSS_dist = na.omit(data.frame(bs_C[10],bs_C[12]))
+TSS_dist = na.omit(data.frame(bs_data[10],bs_data[12]))
 
 for (gene in 1:length(genes_check[,1])) {
   
@@ -254,7 +272,7 @@ plot(result_mean[,6],result_mean[,8])
 plot(result_mean[,6],result_mean[,7])
 
 #par(mfrow=c(1,3))
-#corrplot(corr_mean_all[,,40], method="circle", main="all", type="upper")
-#corrplot(corr_mean_rt[,,40], method="circle", main="r. exp + r. bind", type="upper")
-#corrplot(corr_mean_nort[,,40], method="circle", main="NO r. exp + r. bind", type="upper")
+#corrplot(corr_mean_all[,,loop_count], method="circle", main="all", type="upper")
+#corrplot(corr_mean_rt[,,loop_count], method="circle", main="r. exp + r. bind", type="upper")
+#corrplot(corr_mean_nort[,,loop_count], method="circle", main="NO r. exp + r. bind", type="upper")
 

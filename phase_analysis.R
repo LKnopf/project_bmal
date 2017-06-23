@@ -1,6 +1,7 @@
 
-par(mfrow=c(2,3))
 
+par(mfrow=c(2,3))
+par(mfrow=c(1,1))
 RNA_rhyth = subset(genes_transcript_meta, BH.Q<=0.1)
 hist(as.numeric(RNA_rhyth[,5]), xlim = c(0,24), breaks=24, main="Rhyth. RNA", xlab="RNA peak phase")
 hist(genes_rt[,7], xlim = c(0,24), breaks=24, main="Rhyth. RNA with BS", xlab="RNA peak phase")
