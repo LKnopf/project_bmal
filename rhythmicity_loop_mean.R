@@ -249,8 +249,12 @@ result_mean[,8] = result_mean[,1]/result_mean[,2]
 
 colnames(result_mean) = c("rb+rt", "rb", "rt", "rb-rt", "rhyth%", "top", "rb-rt/rb", "rt+rb/rb")
 
-#par(mfrow=c(1,2))
-#plot(result_mean[,6],result_mean[,8])
-#plot(result_mean[,6],result_mean[,7])
+par(mfrow=c(1,2))
+plot(result_mean[,6],result_mean[,8])
+plot(result_mean[,6],result_mean[,7])
 
+#par(mfrow=c(1,3))
+#corrplot(corr_mean_all[,,40], method="circle", main="all", type="upper")
+#corrplot(corr_mean_rt[,,40], method="circle", main="r. exp + r. bind", type="upper")
+#corrplot(corr_mean_nort[,,40], method="circle", main="NO r. exp + r. bind", type="upper")
 
