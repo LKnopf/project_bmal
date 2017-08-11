@@ -8,9 +8,9 @@ colnames(genes_transcript_meta) = c("Gene", "BH.Q", "ADJ.P", "PER", "LAG", "AMP"
 
 #START HERE WITH PRE-CREATED DATA
 
-bs_data = bs_paper_self #bs_C
+bs_data = bs_C
 loop_count = 1
-loop_step = 2049
+loop_step = 900
 
 tc = bs_data[,19:25]
 tc[,1] = bs_data[,12]
@@ -65,19 +65,19 @@ meta2d("tc_use.txt", outdir = "metaout", filestyle = "txt",
        analysisStrategy = "auto", outputFile = TRUE, outIntegration = "both",
        adjustPhase = "predictedPer", combinePvalue = "fisher",
        weightedPerPha = FALSE, ARSmle = "auto", ARSdefaultPer = 24,
-       outRawData = FALSE, releaseNote = TRUE, outSymbol = "")
+       outRawData = FALSE, releaseNote = TRUE, outSymbol = "",cycMethod="JTK")
 
 meta2d_bs = (read.table("metaout/meta2d_tc_use.txt", header=TRUE))
-#results_norm = meta2d_bs[, c("CycID", "JTK_BH.Q", "JTK_pvalue", "JTK_period", "JTK_adjphase", "JTK_amplitude")]
-results_norm = meta2d_bs[, c("CycID", "ARS_BH.Q", "ARS_pvalue", "ARS_period", "ARS_adjphase", "ARS_amplitude")]
+results_norm = meta2d_bs[, c("CycID", "JTK_BH.Q", "JTK_pvalue", "JTK_period", "JTK_adjphase", "JTK_amplitude")]
+#results_norm = meta2d_bs[, c("CycID", "ARS_BH.Q", "ARS_pvalue", "ARS_period", "ARS_adjphase", "ARS_amplitude")]
 colnames(results_norm) = c("Probeset", "BH.Q", "ADJ.P", "PER", "LAG", "AMP")
 
 
 
 #calc rhythmic %
 
-a = table(results_norm[,2])
-rhyth_numbr[5] = sum(a[names(a)<=0.2])/use_amount
+a = results_norm[,2]
+rhyth_numbr[5] = sum(a <=0.2)/use_amount
 
 
 #count appearences of genes
@@ -135,8 +135,7 @@ for (gene in 1:length(genes_check[,1])) {
   #K = results_norm[L,]
   K = subset(results_norm, L)
   K = K[order(K[,2]),] 
-  print(K)
-  print(genes_check[gene,1])
+
   
   
   
@@ -155,8 +154,7 @@ for (gene in 1:length(genes_check[,1])) {
   N = subset(genes_transcript_meta, M)
   #N = genes_transcript_meta[M,]
   N = N[order(N[,2], decreasing = TRUE),] 
-  print(N)
-  
+
   
   for (step in 1:length(N[,1])) {
     if (N[step,2] <= 0.1) {
