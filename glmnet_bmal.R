@@ -47,14 +47,14 @@ for (i in 1:length(y)){
 cv_bin=cv.glmnet(x,y_bin,alpha=1,family = "binomial")
 par(mfrow=c(1,1))
 plot(cv_bin)
-coef(cv_bin, s = "lambda.min")
+coef(cv_bin, s = "lambda.1se")
 cv_bin$lambda.min
 
 cv_test = cv.glmnet(x_test,y_test,alpha=1)
 
 pred_size = 900
 #sqrt(sum(((predict(cv_bin, newx = x[1:pred_size,], s = "lambda.min")-y_bin[1:pred_size,])/as.numeric(var(y_bin[1:pred_size])))**2)/pred_size)
-y_pred = predict(cv_bin, newx = x[1:pred_size,], s = "lambda.min", type="response") #create predicted y
+y_pred = predict(cv_bin, newx = x[1:pred_size,], s = "lambda.1se", type="response") #create predicted y
 
 comp_y.y_pred= table(y_pred>=0.5,y_bin) #create table comparing predicted an actual response
 print(comp_y.y_pred) #shows hits and misses
@@ -91,7 +91,7 @@ cv_bin$lambda.min
 
 cv_test = cv.glmnet(x_test,y_test,alpha=1)
 
-pred_size = 900
+pred_size = length(x[,1])
 #sqrt(sum(((predict(cv_bin, newx = x[1:pred_size,], s = "lambda.min")-y_trans[1:pred_size,])/as.numeric(var(y_trans[1:pred_size])))**2)/pred_size)
 y_trans_pred = predict(cv_bin, newx = x[1:pred_size,], s = "lambda.min", type="response") #create predicted y
 
