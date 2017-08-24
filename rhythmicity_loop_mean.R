@@ -65,7 +65,7 @@ meta2d("tc_use.txt", outdir = "metaout", filestyle = "txt",
        analysisStrategy = "auto", outputFile = TRUE, outIntegration = "both",
        adjustPhase = "predictedPer", combinePvalue = "fisher",
        weightedPerPha = FALSE, ARSmle = "auto", ARSdefaultPer = 24,
-       outRawData = FALSE, releaseNote = TRUE, outSymbol = "",cycMethod="JTK")
+       outRawData = FALSE, releaseNote = TRUE, outSymbol = "")
 
 meta2d_bs = (read.table("metaout/meta2d_tc_use.txt", header=TRUE))
 results_norm = meta2d_bs[, c("CycID", "JTK_BH.Q", "JTK_pvalue", "JTK_period", "JTK_adjphase", "JTK_amplitude")]
