@@ -9,8 +9,8 @@ colnames(genes_transcript_meta) = c("Gene", "BH.Q", "ADJ.P", "PER", "LAG", "AMP"
 #START HERE WITH PRE-CREATED DATA
 
 bs_data = bs_C
-loop_count = 1
-loop_step = 900
+loop_count = 90
+loop_step = 10
 
 tc = bs_data[,19:25]
 tc[,1] = bs_data[,12]
@@ -29,9 +29,9 @@ tc_sortmean = tc[ order(r.mean, decreasing = T), ]"
 
 
 result_mean = data.frame(matrix(0,loop_count,6))
-corr_mean_all = array(0, dim=c(14,14,loop_count))
-corr_mean_rt = array(0, dim=c(14,14,loop_count))
-corr_mean_nort = array(0, dim=c(14,14,loop_count))
+corr_mean_all = array(0, dim=c(12,12,loop_count))
+corr_mean_rt = array(0, dim=c(12,12,loop_count))
+corr_mean_nort = array(0, dim=c(12,12,loop_count))
 
 for (amount in 1:loop_count) {
 
@@ -55,7 +55,7 @@ colnames(ta) = c("Probeset")
 #meta2d for chip data
 write.table(tc_use, file = "tc_use.txt", append = FALSE, quote = FALSE, sep = "\t",
             eol = "\n", na = "NA", dec = ".", row.names = FALSE,
-            col.names = TRUE)
+            col.names = TRUE) 
 
 meta2d("tc_use.txt", outdir = "metaout", filestyle = "txt", 
        timepoints = c(2,6,10,14,18,22) , 
@@ -241,9 +241,9 @@ genes_rb_rt = subset(genes_rb, rhythmic_transcript>=1) #list of genes with rhyth
 
 
 #make everything in one go
-corr_mean_all[,,amount] = cor(genes_check[, 2:15], method = "spearman")
-corr_mean_rt[,,amount] = cor(genes_rb_rt[, 2:15], method = "spearman")
-corr_mean_nort[,,amount] = cor(genes_rb_nort[, 2:15], method = "spearman")
+corr_mean_all[,,amount] = cor(genes_check[, 2:13], method = "spearman")
+corr_mean_rt[,,amount] = cor(genes_rb_rt[, 2:12], method = "spearman")
+corr_mean_nort[,,amount] = cor(genes_rb_nort[, 2:12], method = "spearman")
 
 #jpeg(paste0("corr_mean_", use_amount, ".jpg"), width=3000, height=1500, pointsize=40)
 par(mfrow=c(1,3))
@@ -265,12 +265,29 @@ result_mean[,8] = result_mean[,1]/result_mean[,2]
 
 colnames(result_mean) = c("rb+rt", "rb", "rt", "rb-rt", "rhyth%", "top", "rb-rt/rb", "rt+rb/rb")
 
-par(mfrow=c(1,2))
+par(mfrow=c(1,1))
 plot(result_mean[,6],result_mean[,8])
 plot(result_mean[,6],result_mean[,7])
 
 #par(mfrow=c(1,3))
-#corrplot(corr_mean_all[,,loop_count], method="circle", main="all", type="upper")
+
+colnames(corr_mean_all) = c("# of BS", "# of rhythmic BS", "# of transcipts", "# of rhythmic transcripts", "phase of binding", "phase of transcript", "q-value of BS", "q-value of transcript", "amplitude of BS", "amplitude of transcript", "mean strength of BS", "mean level of transcript")
+
+rownames(corr_mean_all) = c("# of BS", "# of rhythmic BS", "# of transcipts", "# of rhythmic transcripts", "phase of binding", "phase of transcript", "q-value of BS", "q-value of transcript", "amplitude of BS", "amplitude of transcript", "mean strength of BS", "mean level of transcript")
+
+
+
+png(file="corr_mean_all_max.png",width=2000,height=2000)
+
+
+
+
+par(xpd=TRUE)
+
+corrplot(corr_mean_all[,,loop_count], method="circle", type="upper", mar = c(2, 0, 10, 5), cl.cex = 3, tl.cex = 3)
+
+
+dev.off()
 #corrplot(corr_mean_rt[,,loop_count], method="circle", main="r. exp + r. bind", type="upper")
 #corrplot(corr_mean_nort[,,loop_count], method="circle", main="NO r. exp + r. bind", type="upper")
 
